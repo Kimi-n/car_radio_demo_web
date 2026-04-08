@@ -1,0 +1,611 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.app-container {
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 标题栏 */
+.app-header {
+    background-color: #6200ee;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* 主内容区域 */
+.app-main {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* 主内容包装器，确保16:9比例 */
+.main-content-wrapper {
+    width: 100%;
+    height: 80vh;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 播放控制区 */
+.playback-control-section {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 字幕区 */
+.subtitle-section {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 字幕标题 */
+.subtitle-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.subtitle-header h3 {
+    font-size: 1.5rem;
+    color: #6200ee;
+}
+
+/* 字幕内容 */
+.subtitle-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+/* 字幕段落 */
+.subtitle-paragraph {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #ddd;
+    transition: all 0.3s ease;
+}
+
+/* 当前播放的字幕段落 */
+.subtitle-paragraph.current {
+    color: #fff;
+    background-color: rgba(98, 0, 238, 0.2);
+    padding: 0.5rem 1rem;
+    border-left: 4px solid #6200ee;
+    border-radius: 0 4px 4px 0;
+    transform: translateX(10px);
+}
+
+/* 滚动条样式 */
+.subtitle-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.subtitle-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.subtitle-content::-webkit-scrollbar-thumb {
+    background: rgba(98, 0, 238, 0.5);
+    border-radius: 4px;
+}
+
+.subtitle-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(98, 0, 238, 0.7);
+}
+
+/* 音频信息区域 */
+.audio-info {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#audio-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#audio-subtitle {
+    font-size: 1.1rem;
+    color: #888;
+    margin-bottom: 2rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 进度条 */
+.progress-container {
+    margin: 1.5rem 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #6200ee;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.progress-bar::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #6200ee;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* 功能按钮区域 */
+.function-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.function-btn {
+    flex: 1;
+    background-color: #6200ee;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.function-btn:hover {
+    background-color: #7b1afa;
+}
+
+.function-btn i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 音频文字容器 */
+.audio-text-container {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.audio-text-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.audio-text-header h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.audio-text-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+/* 语音控制提示 */
+.voice-control-hint {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #6200ee;
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+.voice-control-hint i {
+    margin-right: 0.8rem;
+    font-size: 1.2rem;
+}
+
+/* 播放控制区域 */
+.app-footer {
+    background-color: transparent;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: #000000;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 1rem;
+    margin: 0 1rem;
+    transition: transform 0.2s ease;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
+.play-btn {
+    font-size: 2rem;
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 2rem;
+}
+
+.play-btn:hover {
+    background-color: #7b1afa;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 15% auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.playlist-tabs {
+    width: 100%;
+}
+
+/* 标签按钮容器 */
+.tab-buttons {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    margin-bottom: 1px;
+}
+
+/* 标签按钮 */
+.tab-button {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+}
+
+.tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.tab-button.active {
+    background-color: rgba(98, 0, 238, 0.2);
+    color: #6200ee;
+    font-weight: bold;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #6200ee;
+}
+
+/* 分类标签（第二层 tab） */
+.category-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 10px;
+    background-color: rgba(255, 255, 255, 0.03);
+    overflow-x: auto;
+}
+
+.category-tab {
+    padding: 4px 12px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: none;
+    border-radius: 12px;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.category-tab:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.category-tab.active {
+    background-color: rgba(98, 0, 238, 0.3);
+    color: #bb86fc;
+    font-weight: bold;
+}
+
+.category-contents {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+/* 标签内容容器 */
+.tab-contents {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+/* 标签内容 */
+.tab-content {
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 播放列表项 */
+.playlist-item, .audio-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.playlist-item:last-child, .audio-item:last-child {
+    border-bottom: none;
+}
+
+.playlist-item:hover, .audio-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.playlist-item.active, .audio-item.active {
+    background-color: rgba(98, 0, 238, 0.3);
+    border-left: 4px solid #6200ee;
+}
+
+.item-content, .audio-item-info {
+    flex: 1;
+}
+
+.item-info h4, .audio-item-info h4 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    color: #fff;
+}
+
+.item-info p, .audio-item-info p {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin: 0;
+}
+
+.item-status {
+    display: flex;
+    align-items: center;
+    color: #6200ee;
+    font-size: 0.8rem;
+}
+
+.item-status i {
+    margin-right: 0.4rem;
+    animation: pulse 1.5s infinite;
+}
+
+/* 音频列表 */
+.audio-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* 滚动条样式 */
+.tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: rgba(98, 0, 238, 0.5);
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(98, 0, 238, 0.7);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .function-buttons {
+        flex-direction: column;
+    }
+
+    .function-btn {
+        margin: 0.5rem 0;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .function-btn i {
+        margin-right: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    #audio-title {
+        font-size: 1.5rem;
+    }
+
+    #audio-subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-main {
+        padding: 1rem;
+    }
+
+    .app-footer {
+        padding: 1rem;
+    }
+
+    .control-btn {
+        margin: 0 0.5rem;
+    }
+
+    .play-btn {
+        margin: 0 1rem;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+}

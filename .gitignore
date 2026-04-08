@@ -1,0 +1,187 @@
+# 忽略Gradle构建目录
+.gradle/
+build/
+
+# 忽略IDE相关文件
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# 忽略OS相关文件
+.DS_Store
+Thumbs.db
+
+# 忽略日志文件
+*.log
+
+# 忽略临时文件
+*.tmp
+*.temp
+
+# 忽略环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 忽略测试覆盖率文件
+coverage/
+*.lcov
+
+# 忽略打包文件
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# 忽略npm依赖目录
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# 忽略Python依赖目录
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 忽略本地配置文件
+local.properties
+
+# 忽略构建输出目录
+dist/
+out/
+
+# 忽略缓存目录
+.cache/
+.turbo/
+
+# 忽略TypeScript编译输出
+*.tsbuildinfo
+
+# 忽略Next.js构建输出
+.next/
+out/
+
+# 忽略Nuxt.js构建输出
+.nuxt/
+dist/
+
+# 忽略Vite构建输出
+dist/
+out/
+
+# 忽略Vue CLI构建输出
+dist/
+
+# 忽略Angular构建输出
+dist/
+out/
+
+# 忽略React Native构建输出
+*.orig.*
+
+# 忽略Flutter构建输出
+build/
+.dart_tool/
+.pub/
+
+# 忽略Rust构建输出
+target/
+
+# 忽略Go构建输出
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 忽略C/C++构建输出
+*.o
+*.so
+*.so.*
+*.a
+*.la
+*.lo
+*.obj
+*.pch
+*.pdb
+*.ilk
+*.map
+*.exp
+
+# 忽略Java构建输出
+*.class
+*.log
+
+# 忽略Ruby构建输出
+*.gem
+
+# 忽略PHP构建输出
+vendor/
+
+# 忽略Swift构建输出
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace
+
+# 忽略Kotlin构建输出
+build/
+.idea/
+.gradle/
+local.properties
+*.iml
+*.hprof
+
+# 忽略Scala构建输出
+target/
+
+# 忽略Clojure构建输出
+target/
+
+# 忽略Elixir构建输出
+deps/
+_build/
+
+# 忽略Erlang构建输出
+ebin/
+
+# 忽略R构建输出
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# 忽略Julia构建输出
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# 忽略Lua构建输出
+luac.out
+
+# 忽略Perl构建输出
+*.swp
+*~
+
+# 忽略Shell构建输出
+*.sh~
