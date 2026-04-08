@@ -1,611 +1,639 @@
-/* 全局样式 */
-* {
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+:root {
+    --bg-primary: #e9ecf2;
+    --bg-secondary: #f4f5f8;
+    --bg-card: #dfe3ea;
+    --bg-hover: #d3d8e2;
+    --accent: #4a6cf7;
+    --accent-glow: rgba(74, 108, 247, 0.25);
+    --accent-soft: rgba(74, 108, 247, 0.1);
+    --text-primary: #2c3040;
+    --text-secondary: #5c6478;
+    --text-muted: #8890a0;
+    --border: rgba(0, 0, 0, 0.08);
+    --radius: 12px;
+    --transition: 0.2s ease;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #000;
-    color: #fff;
-    line-height: 1.6;
-}
-
-.app-container {
-    min-height: 100vh;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-}
-
-/* 标题栏 */
-.app-header {
-    background-color: #6200ee;
-    padding: 1rem;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.app-header h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-/* 主内容区域 */
-.app-main {
-    flex: 1;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-/* 主内容包装器，确保16:9比例 */
-.main-content-wrapper {
-    width: 100%;
-    height: 80vh;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    height: 100vh;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* 播放控制区 */
-.playback-control-section {
-    flex: 1;
-    padding: 2rem;
+/* ===== Layout ===== */
+.app-container {
+    display: flex;
+    height: 100vh;
+    gap: 1px;
+    background: var(--border);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    width: 380px;
+    min-width: 320px;
+    background: var(--bg-secondary);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+}
+
+.sidebar-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    display: flex;
     align-items: center;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(0, 0, 0, 0.1);
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
 }
 
-/* 字幕区 */
-.subtitle-section {
-    flex: 1;
-    padding: 2rem;
+.logo i {
+    color: var(--accent);
+    font-size: 1.2rem;
+}
+
+/* Channel Tabs (top level) */
+.channel-tabs {
     display: flex;
-    flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.1);
+    padding: 12px 16px 0;
+    gap: 4px;
 }
 
-/* 字幕标题 */
-.subtitle-header {
-    margin-bottom: 1.5rem;
+.tab-button {
+    flex: 1;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all var(--transition);
     text-align: center;
 }
 
-.subtitle-header h3 {
-    font-size: 1.5rem;
-    color: #6200ee;
+.tab-button:hover {
+    color: var(--text-secondary);
 }
 
-/* 字幕内容 */
-.subtitle-content {
+.tab-button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* Category Tabs (second level) */
+.category-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 12px 16px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.category-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.category-tab {
+    padding: 5px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all var(--transition);
+}
+
+.category-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.category-tab.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Content list */
+.tab-content, .tab-contents {
+    display: block;
+}
+
+.channel-contents {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem;
-    background-color: rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-hover) transparent;
+}
+
+.channel-contents::-webkit-scrollbar {
+    width: 4px;
+}
+
+.channel-contents::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 4px;
+}
+
+.category-contents {
+    flex: 1;
+}
+
+.audio-list {
+    list-style: none;
+    padding: 0 8px 8px;
+}
+
+.audio-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin: 2px 0;
     border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+    border-left: 3px solid transparent;
 }
 
-/* 字幕段落 */
-.subtitle-paragraph {
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
-    font-size: 1.1rem;
-    color: #ddd;
-    transition: all 0.3s ease;
+.audio-item:hover {
+    background: var(--bg-hover);
 }
 
-/* 当前播放的字幕段落 */
-.subtitle-paragraph.current {
-    color: #fff;
-    background-color: rgba(98, 0, 238, 0.2);
-    padding: 0.5rem 1rem;
-    border-left: 4px solid #6200ee;
-    border-radius: 0 4px 4px 0;
-    transform: translateX(10px);
+.audio-item.active {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
 }
 
-/* 滚动条样式 */
-.subtitle-content::-webkit-scrollbar {
-    width: 8px;
+.audio-item.active .audio-item-info h4 {
+    color: var(--accent);
 }
 
-.subtitle-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
+.audio-item-info {
+    flex: 1;
+    min-width: 0;
 }
 
-.subtitle-content::-webkit-scrollbar-thumb {
-    background: rgba(98, 0, 238, 0.5);
-    border-radius: 4px;
+.audio-item-info h4 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.subtitle-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(98, 0, 238, 0.7);
+.audio-item-info p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* 音频信息区域 */
-.audio-info {
-    text-align: center;
-    margin-bottom: 2rem;
+/* ===== Player Main ===== */
+.player-main {
+    flex: 1;
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 40px;
+    overflow: hidden;
+}
+
+/* Now Playing */
+.now-playing {
+    margin-bottom: 24px;
+}
+
+.now-playing-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.now-playing-label i {
+    font-size: 0.65rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 #audio-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    max-width: 100%;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 #audio-subtitle {
-    font-size: 1.1rem;
-    color: #888;
-    margin-bottom: 2rem;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
-/* 进度条 */
+.source-label {
+    margin: 0;
+}
+
+/* ===== Player Controls ===== */
+.player-controls {
+    margin-bottom: 28px;
+}
+
 .progress-container {
-    margin: 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.time-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 40px;
+    text-align: center;
 }
 
 .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #444;
-    border-radius: 3px;
+    flex: 1;
+    height: 4px;
+    background: var(--bg-card);
+    border-radius: 4px;
     outline: none;
     -webkit-appearance: none;
-    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: height 0.15s ease;
+}
+
+.progress-bar:hover {
+    height: 6px;
 }
 
 .progress-bar::-webkit-slider-thumb {
     -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    background: #6200ee;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 0 8px var(--accent-glow);
+    transition: transform 0.15s ease;
+}
+
+.progress-bar::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
 }
 
 .progress-bar::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    background: #6200ee;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
     border-radius: 50%;
     cursor: pointer;
     border: none;
+    box-shadow: 0 0 8px var(--accent-glow);
 }
 
-.time-display {
+.progress-bar:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.progress-bar:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Control Buttons */
+.control-buttons {
     display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: #888;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
 }
 
-/* 功能按钮区域 */
-.function-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-}
-
-.function-btn {
-    flex: 1;
-    background-color: #6200ee;
-    color: #fff;
+.ctrl-btn {
+    background: none;
     border: none;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0 0.5rem;
+    color: var(--text-secondary);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+
+.ctrl-btn-play {
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.ctrl-btn-play:hover {
+    background: #2563eb;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+/* ===== Query Bar ===== */
+.query-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    transition: border-color var(--transition);
+}
+
+.query-bar:focus-within {
+    border-color: var(--accent);
+}
+
+.query-bar-icon {
+    color: var(--accent);
     font-size: 1rem;
     cursor: pointer;
+    padding: 4px;
+    transition: color var(--transition);
+}
+
+.query-bar-icon:hover {
+    color: #60a5fa;
+}
+
+.query-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.query-input::placeholder {
+    color: var(--text-muted);
+}
+
+.query-send-btn {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all var(--transition);
+}
+
+.query-send-btn:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+/* ===== Content Panel ===== */
+.content-panel {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    overflow: hidden;
+    min-height: 0;
+}
+
+.content-panel-header {
+    display: flex;
     align-items: center;
-    transition: background-color 0.3s ease;
+    gap: 8px;
+    padding: 14px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
 }
 
-.function-btn:hover {
-    background-color: #7b1afa;
+.content-panel-header i {
+    color: var(--accent);
+    font-size: 0.8rem;
 }
 
-.function-btn i {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-/* 音频文字容器 */
-.audio-text-container {
-    background-color: #333;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-top: 1rem;
-    max-height: 300px;
+.content-body {
+    flex: 1;
     overflow-y: auto;
-    display: none;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-hover) transparent;
 }
 
-.audio-text-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+.content-body::-webkit-scrollbar {
+    width: 4px;
 }
 
-.audio-text-header h3 {
-    font-size: 1.2rem;
-    font-weight: bold;
+.content-body::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 4px;
 }
 
-.close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
+/* Subtitle paragraphs */
+.subtitle-paragraph {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
 }
 
-.audio-text-content {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #ddd;
+.subtitle-paragraph.current {
+    color: var(--text-primary);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
 }
 
-/* 语音控制提示 */
-.voice-control-hint {
-    position: absolute;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #6200ee;
-    padding: 1rem 1.5rem;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    display: none;
-}
-
-.voice-control-hint i {
-    margin-right: 0.8rem;
-    font-size: 1.2rem;
-}
-
-/* 播放控制区域 */
-.app-footer {
-    background-color: transparent;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.control-btn {
-    background: none;
-    border: none;
-    color: #000000;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 1rem;
-    margin: 0 1rem;
-    transition: transform 0.2s ease;
-}
-
-.control-btn:hover {
-    transform: scale(1.1);
-}
-
-.play-btn {
-    font-size: 2rem;
-    background-color: #000000;
-    color: #ffffff;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 2rem;
-}
-
-.play-btn:hover {
-    background-color: #7b1afa;
-}
-
-/* 模态框 */
+/* ===== Utilities ===== */
 .modal {
     display: none;
     position: fixed;
+    inset: 0;
     z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
 }
 
 .modal-content {
-    background-color: #333;
-    margin: 15% auto;
-    padding: 1.5rem;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    background: var(--bg-card);
+    margin: 10% auto;
+    padding: 24px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
 }
 
 .modal-header h3 {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
-.playlist-tabs {
-    width: 100%;
-}
-
-/* 标签按钮容器 */
-.tab-buttons {
-    display: flex;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
-    margin-bottom: 1px;
-}
-
-/* 标签按钮 */
-.tab-button {
-    flex: 1;
-    padding: 0.8rem 1rem;
-    background-color: rgba(255, 255, 255, 0.05);
+.close-btn {
+    background: none;
     border: none;
-    color: #aaa;
+    color: var(--text-muted);
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: center;
-    position: relative;
+    padding: 4px;
 }
 
-.tab-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.close-btn:hover {
+    color: var(--text-primary);
+}
+
+.voice-hint {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
     color: #fff;
-}
-
-.tab-button.active {
-    background-color: rgba(98, 0, 238, 0.2);
-    color: #6200ee;
-    font-weight: bold;
-}
-
-.tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: #6200ee;
-}
-
-/* 分类标签（第二层 tab） */
-.category-tabs {
-    display: flex;
-    gap: 4px;
-    padding: 6px 10px;
-    background-color: rgba(255, 255, 255, 0.03);
-    overflow-x: auto;
-}
-
-.category-tab {
-    padding: 4px 12px;
-    background-color: rgba(255, 255, 255, 0.08);
-    border: none;
-    border-radius: 12px;
-    color: #aaa;
-    cursor: pointer;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.category-tab:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: #fff;
-}
-
-.category-tab.active {
-    background-color: rgba(98, 0, 238, 0.3);
-    color: #bb86fc;
-    font-weight: bold;
-}
-
-.category-contents {
-    max-height: 260px;
-    overflow-y: auto;
-}
-
-/* 标签内容容器 */
-.tab-contents {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 0 0 8px 8px;
-    overflow: hidden;
-}
-
-/* 标签内容 */
-.tab-content {
+    padding: 12px 24px;
+    border-radius: 24px;
     display: none;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* 播放列表项 */
-.playlist-item, .audio-item {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.playlist-item:last-child, .audio-item:last-child {
-    border-bottom: none;
-}
-
-.playlist-item:hover, .audio-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateX(4px);
-}
-
-.playlist-item.active, .audio-item.active {
-    background-color: rgba(98, 0, 238, 0.3);
-    border-left: 4px solid #6200ee;
-}
-
-.item-content, .audio-item-info {
-    flex: 1;
-}
-
-.item-info h4, .audio-item-info h4 {
-    font-size: 1rem;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-    color: #fff;
-}
-
-.item-info p, .audio-item-info p {
-    font-size: 0.9rem;
-    color: #aaa;
-    margin: 0;
-}
-
-.item-status {
-    display: flex;
     align-items: center;
-    color: #6200ee;
-    font-size: 0.8rem;
+    gap: 10px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 16px var(--accent-glow);
+    z-index: 999;
 }
 
-.item-status i {
-    margin-right: 0.4rem;
-    animation: pulse 1.5s infinite;
+/* Mobile floating buttons */
+.mobile-playlist-btn,
+.mobile-voice-btn {
+    display: none;
+    position: fixed;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 音频列表 */
-.audio-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.mobile-playlist-btn {
+    bottom: 24px;
+    right: 80px;
 }
 
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 1;
-    }
+.mobile-voice-btn {
+    bottom: 24px;
+    right: 24px;
 }
 
-/* 滚动条样式 */
-.tab-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.tab-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-}
-
-.tab-content::-webkit-scrollbar-thumb {
-    background: rgba(98, 0, 238, 0.5);
-    border-radius: 3px;
-}
-
-.tab-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(98, 0, 238, 0.7);
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .function-buttons {
-        flex-direction: column;
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .sidebar {
+        display: none;
     }
 
-    .function-btn {
-        margin: 0.5rem 0;
-        flex-direction: row;
-        justify-content: center;
+    .mobile-playlist-btn,
+    .mobile-voice-btn {
+        display: flex;
     }
 
-    .function-btn i {
-        margin-right: 0.5rem;
-        margin-bottom: 0;
+    .player-main {
+        padding: 24px 20px;
     }
 
     #audio-title {
-        font-size: 1.5rem;
-    }
-
-    #audio-subtitle {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 }
 
 @media (max-width: 480px) {
-    .app-main {
-        padding: 1rem;
+    .player-main {
+        padding: 16px;
     }
 
-    .app-footer {
-        padding: 1rem;
+    .control-buttons {
+        gap: 16px;
     }
 
-    .control-btn {
-        margin: 0 0.5rem;
-    }
-
-    .play-btn {
-        margin: 0 1rem;
-    }
-
-    .modal-content {
-        width: 90%;
-        margin: 20% auto;
+    .ctrl-btn-play {
+        width: 48px;
+        height: 48px;
     }
 }

@@ -3,440 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>车机网络电台</title>
+    <title>车载智能电台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* 全局样式 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        /* 应用容器 */
-        .app-container {
-            max-width: 100%;
-            margin: 0 auto;
-            background-color: #fff;
-            min-height: 100vh;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 标题栏 */
-        .app-header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .app-header h1 {
-            font-size: 24px;
-        }
-
-        /* 主内容区域 */
-        .app-main {
-            padding: 20px;
-        }
-
-        /* 音频信息区域 */
-        .audio-info {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .audio-info h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .audio-info p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        /* 进度条 */
-        .progress-container {
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .progress-bar::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #333;
-            cursor: pointer;
-        }
-
-        .progress-bar::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #333;
-            cursor: pointer;
-            border: none;
-        }
-
-        .time-display {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* 功能按钮区域 */
-        .function-buttons {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
-        }
-
-        .function-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        .function-btn i {
-            font-size: 24px;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .function-btn span {
-            font-size: 12px;
-            color: #666;
-        }
-
-        /* 主内容包装器 */
-        .main-content-wrapper {
-            display: flex;
-            gap: 20px;
-            height: 400px;
-        }
-
-        /* 左侧：播放控制区 */
-        .playback-control-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* 右侧：字幕区 */
-        .subtitle-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .subtitle-header {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            background-color: #f5f5f5;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .subtitle-header h3 {
-            margin: 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .subtitle-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            line-height: 1.8;
-        }
-
-        .subtitle-paragraph {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .subtitle-paragraph.current {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            font-weight: bold;
-            transform: translateX(5px);
-        }
-
-        .subtitle-paragraph.current::before {
-            content: "▶ ";
-        }
-
-        /* 语音控制提示 */
-        .voice-control-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .voice-control-hint i {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        /* 播放控制区域 */
-        .app-footer {
-            background-color: transparent;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .control-btn {
-            background: none;
-            border: none;
-            color: #000;
-            font-size: 24px;
-            margin: 0 20px;
-            cursor: pointer;
-        }
-
-        .play-btn {
-            font-size: 32px;
-            background-color: #000;
-            color: #fff;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* 模态框 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 10px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-        }
-
-        /* 标签页样式 */
-        .playlist-tabs {
-            margin-top: 20px;
-        }
-
-        .tab-buttons {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-
-        .tab-button {
-            padding: 10px 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            color: #666;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-button.active {
-            color: #333;
-            border-bottom-color: #333;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 音频列表 */
-        .audio-list {
-            list-style: none;
-        }
-
-        .audio-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        .audio-item:hover {
-            background-color: #f5f5f5;
-        }
-
-        .audio-item.active {
-            background-color: #e3f2fd;
-        }
-
-        .audio-item-info h4 {
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .audio-item-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- 标题栏 -->
-        <header class="app-header">
-            <h1>车机网络电台</h1>
-        </header>
-
-        <!-- 主内容区域 -->
-        <main class="app-main">
-            <div class="main-content-wrapper">
-                <!-- 左侧：播放控制区 -->
-                <div class="playback-control-section">
-                    <!-- 音频信息区域 -->
-                    <div class="audio-info">
-                        <h2 id="audio-title">音频标题</h2>
-                        <p id="audio-subtitle">音频副标题</p>
-
-                        <!-- 音频进度条 -->
-                        <div class="progress-container">
-                            <input type="range" id="progress-bar" class="progress-bar" min="0" max="100" value="0">
-                            <div class="time-display">
-                                <span id="current-time">00:00</span>
-                                <span id="total-time">00:00</span>
-                            </div>
-                        </div>
-
-                        <!-- 播放控制区域 -->
-                        <div class="app-footer">
-                            <button id="btn-previous" class="control-btn">
-                                <i class="fas fa-step-backward"></i>
-                            </button>
-                            <button id="btn-play-pause" class="control-btn play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button id="btn-next" class="control-btn">
-                                <i class="fas fa-step-forward"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 功能按钮区域 -->
-                    <div class="function-buttons">
-                        <button id="btn-playlist" class="function-btn">
-                            <i class="fas fa-list"></i>
-                            <span>播放列表</span>
-                        </button>
-                        <button id="btn-voice-control" class="function-btn">
-                            <i class="fas fa-microphone"></i>
-                            <span>语音控制</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 右侧：字幕区 -->
-                <div class="subtitle-section">
-                    <div class="subtitle-header">
-                    </div>
-                    <div id="audio-text-content" class="subtitle-content">
-                        <p class="subtitle-paragraph">音频文字内容将显示在这里</p>
-                    </div>
+        <!-- 左侧：内容列表 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <span>智能电台</span>
                 </div>
             </div>
 
-            <!-- 语音控制提示 -->
-            <div id="voice-control-hint" class="voice-control-hint">
-                <i class="fas fa-microphone"></i>
-                <span>请说出您的指令...</span>
+            <!-- 栏目/分类 tab 直接展示 -->
+            <div id="tab-buttons" class="channel-tabs"></div>
+            <div id="tab-contents" class="channel-contents"></div>
+        </aside>
+
+        <!-- 右侧：播放器 -->
+        <main class="player-main">
+            <!-- 当前播放信息 -->
+            <div class="now-playing">
+                <div class="now-playing-label">
+                    <i class="fas fa-signal"></i>
+                    <span>正在播放</span>
+                </div>
+                <h1 id="audio-title">等待加载...</h1>
+                <p id="audio-subtitle" class="source-label"></p>
+            </div>
+
+            <!-- 播放控制 -->
+            <div class="player-controls">
+                <div class="progress-container">
+                    <span id="current-time" class="time-label">00:00</span>
+                    <input type="range" id="progress-bar" class="progress-bar" min="0" max="100" value="0">
+                    <span id="total-time" class="time-label">--:--</span>
+                </div>
+
+                <div class="control-buttons">
+                    <button id="btn-previous" class="ctrl-btn" title="上一首">
+                        <i class="fas fa-backward-step"></i>
+                    </button>
+                    <button id="btn-play-pause" class="ctrl-btn ctrl-btn-play" title="播放/暂停">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button id="btn-next" class="ctrl-btn" title="下一首">
+                        <i class="fas fa-forward-step"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 搜索/语音输入 -->
+            <div class="query-bar">
+                <i class="fas fa-microphone query-bar-icon" id="btn-voice-input" title="语音输入"></i>
+                <input type="text" id="query-input" class="query-input" placeholder="输入你想听的内容...">
+                <button id="btn-query-send" class="query-send-btn" title="发送">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- 内容正文 -->
+            <div class="content-panel">
+                <div class="content-panel-header">
+                    <i class="fas fa-align-left"></i>
+                    <span>内容详情</span>
+                </div>
+                <div id="audio-text-content" class="content-body">
+                    <p class="subtitle-paragraph">内容将在此处显示</p>
+                </div>
             </div>
         </main>
-
-
     </div>
 
-    <!-- 播放列表模态框 -->
+    <!-- 播放列表模态框（保留用于移动端） -->
     <div id="playlist-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>播放列表</h3>
-                <button id="close-playlist" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="playlist-tabs">
-                <div id="tab-buttons" class="tab-buttons">
-                    <!-- 标签按钮将动态添加 -->
-                </div>
-                <div id="tab-contents" class="tab-contents">
-                    <!-- 标签内容将动态添加 -->
-                </div>
+                <button id="close-playlist" class="close-btn"><i class="fas fa-times"></i></button>
             </div>
         </div>
     </div>
+
+    <!-- 语音控制提示 -->
+    <div id="voice-control-hint" class="voice-hint">
+        <i class="fas fa-microphone"></i>
+        <span>请说出您的指令...</span>
+    </div>
+
+    <!-- 播放列表按钮（移动端） -->
+    <button id="btn-playlist" class="mobile-playlist-btn">
+        <i class="fas fa-list"></i>
+    </button>
+    <button id="btn-voice-control" class="mobile-voice-btn">
+        <i class="fas fa-microphone"></i>
+    </button>
 
     <script src="js/audioPlayer.js"></script>
     <script src="js/main.js"></script>

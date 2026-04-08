@@ -22,8 +22,12 @@ DOWNSTREAM_WS_TIMEOUT = int(os.environ.get("DOWNSTREAM_WS_TIMEOUT", "30"))
 DEVICE_ID = os.environ.get("DEVICE_ID", "car-radio-demo-001")
 
 
-def build_request_body(session_id: str) -> dict:
+DEFAULT_QUERY = "播放新闻"
+
+
+def build_request_body(session_id: str, query: str = "") -> dict:
     """构造下游服务请求体"""
+    effective_query = query if query else DEFAULT_QUERY
     return {
         "sessionId": session_id,
         "interactionId": "1",
@@ -34,19 +38,19 @@ def build_request_body(session_id: str) -> dict:
         "news_box": {
             "needChannel": True,
             "news": [],
-            "query": "",
+            "query": effective_query,
             "category": "",
         },
-        "query": "",
+        "query": effective_query,
     }
 
 
-def fetch_audio_data_from_downstream(session_id: str) -> dict:
+def fetch_audio_data_from_downstream(session_id: str, query: str = "") -> dict:
     """请求下游服务获取音频数据，直接透传响应"""
     url = f"{DOWNSTREAM_BASE_URL}{DOWNSTREAM_AUDIO_PATH}"
-    logger.info("请求下游服务: %s, sessionId: %s", url, session_id)
+    logger.info("请求下游服务: %s, sessionId: %s, query: %s", url, session_id, query)
 
-    body = json.dumps(build_request_body(session_id)).encode("utf-8")
+    body = json.dumps(build_request_body(session_id, query)).encode("utf-8")
     req = urllib_request.Request(
         url,
         data=body,
@@ -176,8 +180,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                     request_body = json.loads(raw_body)
 
                 session_id = request_body.get("sessionId", "")
+                query = request_body.get("query", "")
 
-                data = fetch_audio_data_from_downstream(session_id)
+                data = fetch_audio_data_from_downstream(session_id, query)
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')

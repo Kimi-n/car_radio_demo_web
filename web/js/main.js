@@ -32,6 +32,28 @@ window.onload = function() {
             });
         }
 
+        // 搜索/query 输入
+        var queryInput = document.getElementById('query-input');
+        var btnQuerySend = document.getElementById('btn-query-send');
+
+        function sendQuery() {
+            if (!queryInput || !audioPlayer) return;
+            var query = queryInput.value.trim();
+            if (!query) return;
+            console.log('发送 query:', query);
+            audioPlayer.fetchFromCloudWithQuery(query);
+            queryInput.value = '';
+        }
+
+        if (btnQuerySend) {
+            btnQuerySend.addEventListener('click', sendQuery);
+        }
+        if (queryInput) {
+            queryInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') sendQuery();
+            });
+        }
+
         // 页面离开时保存播放位置
         window.addEventListener('beforeunload', function() {
             savePlayPosition();
