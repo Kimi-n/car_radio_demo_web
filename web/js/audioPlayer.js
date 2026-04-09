@@ -93,7 +93,7 @@ class AudioPlayer {
                 this.sessionId = this.generateSessionId();
             }
 
-            const response = await fetch('http://localhost:3000/api/audio-data', {
+            const response = await fetch('/api/audio-data', {
                 method: 'POST',
                 signal: controller.signal,
                 headers: {
@@ -446,7 +446,7 @@ class AudioPlayer {
             const audioItem = category.items[itemIndex];
             // 通过 docId 加载音频流
             if (audioItem.docId) {
-                this.audioElement.src = `http://localhost:3000/api/audio-stream?docId=${encodeURIComponent(audioItem.docId)}`;
+                this.audioElement.src = `/api/audio-stream?docId=${encodeURIComponent(audioItem.docId)}`;
                 this.audioElement.load();
             }
             this.updateAudioInfo(audioItem);
@@ -574,9 +574,7 @@ class AudioPlayer {
 
                         listItem.addEventListener('click', () => {
                             this.playAudio(channelIndex, categoryIndex, itemIndex);
-                            if (this.isPlaying) {
-                                this.play();
-                            }
+                            this.play();
                         });
 
                         const audioInfo = document.createElement('div');

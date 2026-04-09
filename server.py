@@ -2,7 +2,9 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 import logging
+import mimetypes
 import os
+from pathlib import Path
 from urllib import request as urllib_request
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse, parse_qs
@@ -20,6 +22,9 @@ DOWNSTREAM_WS_TIMEOUT = int(os.environ.get("DOWNSTREAM_WS_TIMEOUT", "30"))
 
 
 DEVICE_ID = os.environ.get("DEVICE_ID", "car-radio-demo-001")
+
+# 静态文件目录
+STATIC_DIR = Path(__file__).resolve().parent / "web"
 
 
 DEFAULT_QUERY = "播放新闻"
@@ -165,7 +170,42 @@ class RequestHandler(BaseHTTPRequestHandler):
                 except Exception:
                     pass
         else:
+            self._serve_static(parsed.path)
+
+    def _serve_static(self, url_path: str) -> None:
+        """提供静态文件服务"""
+        # 默认 / → /index.html
+        if url_path == "/":
+            url_path = "/index.html"
+
+        # 安全检查：防止路径穿越
+        safe_path = Path(os.path.normpath(url_path.lstrip("/")))
+        if ".." in safe_path.parts:
+            self.send_response(403)
+            self.end_headers()
+            return
+
+        file_path = STATIC_DIR / safe_path
+
+        if not file_path.is_file():
             self.send_response(404)
+            self.end_headers()
+            return
+
+        content_type, _ = mimetypes.guess_type(str(file_path))
+        if content_type is None:
+            content_type = "application/octet-stream"
+
+        try:
+            data = file_path.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+        except OSError as e:
+            logger.error("读取静态文件失败: %s", e)
+            self.send_response(500)
             self.end_headers()
 
     def do_POST(self):
@@ -211,6 +251,7 @@ if __name__ == '__main__':
     server_address = ('', port)
     httpd = HTTPServer(server_address, RequestHandler)
     print(f"云侧服务启动成功，监听端口 {port}")
+    print(f"前端页面:     http://localhost:{port}/")
     print(f"健康检查接口: http://localhost:{port}/health")
     print(f"音频数据接口: http://localhost:{port}/api/audio-data")
     print(f"音频流接口:   http://localhost:{port}/api/audio-stream?docId=xxx")
