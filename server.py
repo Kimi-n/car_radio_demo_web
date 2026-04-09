@@ -112,6 +112,11 @@ class RequestHandler(BaseHTTPRequestHandler):
     # HTTP/1.1 才支持 Transfer-Encoding: chunked
     protocol_version = "HTTP/1.1"
 
+    def end_headers(self):
+        # 全局禁用 keep-alive，避免 BaseHTTPRequestHandler 连接复用导致的问题
+        self.send_header("Connection", "close")
+        super().end_headers()
+
     def do_OPTIONS(self):
         """处理 CORS 预检请求"""
         self.send_response(200)
@@ -148,7 +153,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/mpeg')
                 self.send_header('Transfer-Encoding', 'chunked')
-                self.send_header('Connection', 'close')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
 
