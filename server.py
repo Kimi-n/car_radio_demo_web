@@ -108,6 +108,9 @@ def stream_audio_chunks(doc_id: str):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
+    # HTTP/1.1 才支持 Transfer-Encoding: chunked
+    protocol_version = "HTTP/1.1"
+
     def do_OPTIONS(self):
         """处理 CORS 预检请求"""
         self.send_response(200)
@@ -140,27 +143,70 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": "缺少 docId 参数"}).encode('utf-8'))
                 return
 
+            ws = None
             try:
+                # 直接在 handler 内建立 WebSocket 连接，避免 generator yield 中断
+                ws_parsed = urlparse(DOWNSTREAM_BASE_URL)
+                ws_scheme = "wss" if ws_parsed.scheme == "https" else "ws"
+                ws_url = f"{ws_scheme}://{ws_parsed.netloc}/accs/media/stream/download"
+                logger.info("WebSocket 连接: %s, docId: %s", ws_url, doc_id)
+
+                request_payload = json.dumps({
+                    "events": [{
+                        "header": {
+                            "namespace": "ChannelsService",
+                            "name": "GetMediaChannelInfo"
+                        },
+                        "payload": {"docId": doc_id}
+                    }]
+                })
+
+                ws = websocket.create_connection(ws_url, timeout=DOWNSTREAM_WS_TIMEOUT)
+                ws.send(request_payload)
+                logger.info("WebSocket 请求已发送")
+
                 self.send_response(200)
-                self.send_header('Content-type', 'audio/mpeg')
+                self.send_header('Content-Type', 'audio/mpeg')
                 self.send_header('Transfer-Encoding', 'chunked')
+                self.send_header('Connection', 'close')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
 
-                for chunk in stream_audio_chunks(doc_id):
-                    # HTTP chunked encoding: 长度(hex)\r\n数据\r\n
-                    chunk_header = f"{len(chunk):X}\r\n".encode("ascii")
-                    self.wfile.write(chunk_header)
-                    self.wfile.write(chunk)
-                    self.wfile.write(b"\r\n")
-                    self.wfile.flush()
+                chunk_count = 0
+                total_bytes = 0
+                while True:
+                    try:
+                        opcode, data = ws.recv_data()
+                    except websocket.WebSocketConnectionClosedException:
+                        logger.info("WebSocket 连接已关闭，共收到 %d 块，%d bytes", chunk_count, total_bytes)
+                        break
+                    except Exception as recv_err:
+                        logger.error("WebSocket recv 异常: %s (%s)", recv_err, type(recv_err).__name__)
+                        break
+
+                    if opcode == websocket.ABNF.OPCODE_BINARY:
+                        chunk_count += 1
+                        total_bytes += len(data)
+                        logger.info("收到音频块 #%d, 大小: %d bytes", chunk_count, len(data))
+                        chunk_header = f"{len(data):X}\r\n".encode("ascii")
+                        self.wfile.write(chunk_header)
+                        self.wfile.write(data)
+                        self.wfile.write(b"\r\n")
+                        self.wfile.flush()
+                    elif opcode == websocket.ABNF.OPCODE_TEXT:
+                        msg = data.decode("utf-8", errors="replace")
+                        logger.info("WebSocket 文本消息: %s", msg[:300])
+                    elif opcode == websocket.ABNF.OPCODE_CLOSE:
+                        logger.info("收到 CLOSE 帧，共 %d 块，%d bytes", chunk_count, total_bytes)
+                        break
+                    else:
+                        logger.info("WebSocket 未知 opcode: %d", opcode)
 
                 # chunked 结束标记
                 self.wfile.write(b"0\r\n\r\n")
                 self.wfile.flush()
             except Exception as e:
-                logger.error("获取音频流失败: %s", e)
-                # 如果 header 还没发出去才能返回错误码
+                logger.error("音频流失败: %s (%s)", e, type(e).__name__)
                 try:
                     self.send_response(502)
                     self.send_header('Content-type', 'application/json')
@@ -169,6 +215,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(json.dumps({"error": "获取音频流失败"}).encode('utf-8'))
                 except Exception:
                     pass
+            finally:
+                if ws:
+                    try:
+                        ws.close()
+                    except Exception:
+                        pass
         else:
             self._serve_static(parsed.path)
 
