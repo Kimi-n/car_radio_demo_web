@@ -484,8 +484,7 @@ class AudioPlayer {
             this._audioBlobUrl = null;
         }
 
-        var self = this;
-        var signal = this._audioAbortController.signal;
+        const signal = this._audioAbortController.signal;
 
         // 检测浏览器是否支持 MediaSource + audio/mpeg
         if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
@@ -497,49 +496,46 @@ class AudioPlayer {
     }
 
     _streamWithMediaSource(docId, signal) {
-        var self = this;
-        var mediaSource = new MediaSource();
+        const mediaSource = new MediaSource();
         this._mediaSource = mediaSource;
         this._audioBlobUrl = URL.createObjectURL(mediaSource);
         this.audioElement.src = this._audioBlobUrl;
 
-        mediaSource.addEventListener('sourceopen', function() {
-            var sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
-            var queue = [];
-            var streamDone = false;
+        mediaSource.addEventListener('sourceopen', () => {
+            const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+            const queue = [];
+            let streamDone = false;
 
-            function appendNext() {
+            const appendNext = () => {
                 if (sourceBuffer.updating || mediaSource.readyState !== 'open') return;
                 if (queue.length > 0) {
                     sourceBuffer.appendBuffer(queue.shift());
                 } else if (streamDone) {
                     try { mediaSource.endOfStream(); } catch (e) {}
                 }
-            }
+            };
 
             sourceBuffer.addEventListener('updateend', appendNext);
 
-            fetch('/api/audio-stream?docId=' + encodeURIComponent(docId), { signal: signal })
-                .then(function(response) {
+            fetch('/api/audio-stream?docId=' + encodeURIComponent(docId), { signal })
+                .then((response) => {
                     if (!response.ok) throw new Error('音频请求失败: ' + response.status);
-                    var reader = response.body.getReader();
+                    const reader = response.body.getReader();
 
-                    function read() {
-                        return reader.read().then(function(result) {
-                            if (result.done) {
-                                streamDone = true;
-                                appendNext();
-                                return;
-                            }
-                            queue.push(result.value);
+                    const read = () => reader.read().then((result) => {
+                        if (result.done) {
+                            streamDone = true;
                             appendNext();
-                            return read();
-                        });
-                    }
+                            return;
+                        }
+                        queue.push(result.value);
+                        appendNext();
+                        return read();
+                    });
 
                     return read();
                 })
-                .catch(function(err) {
+                .catch((err) => {
                     if (err.name === 'AbortError') return;
                     console.error('音频流加载失败:', err);
                 });
@@ -547,31 +543,27 @@ class AudioPlayer {
     }
 
     _streamWithBlobFallback(docId, signal) {
-        var self = this;
-
-        fetch('/api/audio-stream?docId=' + encodeURIComponent(docId), { signal: signal })
-            .then(function(response) {
+        fetch('/api/audio-stream?docId=' + encodeURIComponent(docId), { signal })
+            .then((response) => {
                 if (!response.ok) throw new Error('音频请求失败: ' + response.status);
-                var reader = response.body.getReader();
-                var chunks = [];
+                const reader = response.body.getReader();
+                const chunks = [];
 
-                function read() {
-                    return reader.read().then(function(result) {
-                        if (result.done) {
-                            var blob = new Blob(chunks, { type: 'audio/mpeg' });
-                            self._audioBlobUrl = URL.createObjectURL(blob);
-                            self.audioElement.src = self._audioBlobUrl;
-                            self.audioElement.load();
-                            return;
-                        }
-                        chunks.push(result.value);
-                        return read();
-                    });
-                }
+                const read = () => reader.read().then((result) => {
+                    if (result.done) {
+                        const blob = new Blob(chunks, { type: 'audio/mpeg' });
+                        this._audioBlobUrl = URL.createObjectURL(blob);
+                        this.audioElement.src = this._audioBlobUrl;
+                        this.audioElement.load();
+                        return;
+                    }
+                    chunks.push(result.value);
+                    return read();
+                });
 
                 return read();
             })
-            .catch(function(err) {
+            .catch((err) => {
                 if (err.name === 'AbortError') return;
                 console.error('音频流加载失败:', err);
             });

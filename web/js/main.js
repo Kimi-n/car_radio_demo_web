@@ -1,8 +1,8 @@
 // main.js - 页面初始化和播放位置持久化
 
-var audioPlayer = null;
+let audioPlayer = null;
 
-window.onload = function() {
+window.onload = () => {
     try {
         audioPlayer = new AudioPlayer();
 
@@ -10,54 +10,48 @@ window.onload = function() {
         restorePlayPosition();
 
         // 点击模态框外部关闭模态框
-        window.onclick = function(event) {
-            var modal = document.getElementById('playlist-modal');
+        window.onclick = (event) => {
+            const modal = document.getElementById('playlist-modal');
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
         };
 
         // 监听上一首/下一首按钮，保存播放位置
-        var btnPrevious = document.getElementById('btn-previous');
+        const btnPrevious = document.getElementById('btn-previous');
         if (btnPrevious) {
-            btnPrevious.addEventListener('click', function() {
-                savePlayPosition();
-            });
+            btnPrevious.addEventListener('click', () => savePlayPosition());
         }
 
-        var btnNext = document.getElementById('btn-next');
+        const btnNext = document.getElementById('btn-next');
         if (btnNext) {
-            btnNext.addEventListener('click', function() {
-                savePlayPosition();
-            });
+            btnNext.addEventListener('click', () => savePlayPosition());
         }
 
         // 搜索/query 输入
-        var queryInput = document.getElementById('query-input');
-        var btnQuerySend = document.getElementById('btn-query-send');
+        const queryInput = document.getElementById('query-input');
+        const btnQuerySend = document.getElementById('btn-query-send');
 
-        function sendQuery() {
+        const sendQuery = () => {
             if (!queryInput || !audioPlayer) return;
-            var query = queryInput.value.trim();
+            const query = queryInput.value.trim();
             if (!query) return;
             console.log('发送 query:', query);
             audioPlayer.fetchFromCloudWithQuery(query);
             queryInput.value = '';
-        }
+        };
 
         if (btnQuerySend) {
             btnQuerySend.addEventListener('click', sendQuery);
         }
         if (queryInput) {
-            queryInput.addEventListener('keydown', function(e) {
+            queryInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') sendQuery();
             });
         }
 
         // 页面离开时保存播放位置
-        window.addEventListener('beforeunload', function() {
-            savePlayPosition();
-        });
+        window.addEventListener('beforeunload', () => savePlayPosition());
     } catch (error) {
         console.error('页面初始化时出错:', error);
     }
@@ -67,8 +61,7 @@ window.onload = function() {
 function savePlayPosition() {
     if (!audioPlayer) return;
 
-    var progressBar = document.getElementById('progress-bar');
-    var playPosition = {
+    const playPosition = {
         channelIndex: audioPlayer.currentChannelIndex,
         categoryIndex: audioPlayer.currentCategoryIndex,
         itemIndex: audioPlayer.currentItemIndex,
@@ -82,17 +75,17 @@ function savePlayPosition() {
 function restorePlayPosition() {
     if (!audioPlayer) return;
 
-    var savedPosition = localStorage.getItem('playPosition');
+    const savedPosition = localStorage.getItem('playPosition');
     if (!savedPosition) return;
 
     try {
-        var pos = JSON.parse(savedPosition);
-        var channels = audioPlayer.audioData.channels;
+        const pos = JSON.parse(savedPosition);
+        const channels = audioPlayer.audioData.channels;
         if (!channels || !channels.length) return;
 
-        var chIdx = pos.channelIndex || 0;
-        var catIdx = pos.categoryIndex || 0;
-        var itemIdx = pos.itemIndex || 0;
+        const chIdx = pos.channelIndex || 0;
+        const catIdx = pos.categoryIndex || 0;
+        const itemIdx = pos.itemIndex || 0;
 
         // 边界检查
         if (chIdx >= channels.length) return;
@@ -103,7 +96,7 @@ function restorePlayPosition() {
         audioPlayer.currentCategoryIndex = catIdx;
         audioPlayer.currentItemIndex = itemIdx;
 
-        var item = channels[chIdx].categories[catIdx].items[itemIdx];
+        const item = channels[chIdx].categories[catIdx].items[itemIdx];
         audioPlayer.updateAudioInfo(item);
         audioPlayer.updatePlaylistUI();
 
