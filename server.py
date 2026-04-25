@@ -23,6 +23,9 @@ DOWNSTREAM_WS_TIMEOUT = int(os.environ.get("DOWNSTREAM_WS_TIMEOUT", "30"))
 
 DEVICE_ID = os.environ.get("DEVICE_ID", "car-radio-demo-001")
 
+# 获取频道数据的方式: "http"(默认，走 HTTP 接口) 或 "ws"(走 WebSocket stream/download 接口)
+CHANNEL_FETCH_MODE = os.environ.get("CHANNEL_FETCH_MODE", "http")
+
 # 静态文件目录
 STATIC_DIR = Path(__file__).resolve().parent / "web"
 
@@ -66,6 +69,44 @@ def fetch_audio_data_from_downstream(session_id: str, query: str = "") -> dict:
     resp = urllib_request.urlopen(req, timeout=DOWNSTREAM_TIMEOUT)
     raw = resp.read().decode("utf-8")
     return json.loads(raw)
+
+
+def fetch_audio_data_via_ws(session_id: str, query: str = "") -> dict:
+    """通过 WebSocket stream/download 接口获取频道数据（备用方案）"""
+    parsed = urlparse(DOWNSTREAM_BASE_URL)
+    ws_scheme = "wss" if parsed.scheme == "https" else "ws"
+    ws_url = f"{ws_scheme}://{parsed.netloc}/accs/media/stream/download"
+    logger.info("WebSocket 获取频道数据: %s, sessionId: %s, query: %s", ws_url, session_id, query)
+
+    request_payload = json.dumps({
+        "session": {},
+        "events": [{
+            "header": {
+                "namespace": "ChannelsService",
+                "name": "GetAllChannelInfo"
+            },
+            "payload": build_request_body(session_id, query)
+        }]
+    })
+
+    ws = websocket.create_connection(ws_url, timeout=DOWNSTREAM_WS_TIMEOUT)
+    try:
+        ws.send(request_payload)
+        while True:
+            opcode, data = ws.recv_data()
+            if opcode == websocket.ABNF.OPCODE_TEXT:
+                msg = data.decode("utf-8", errors="replace")
+                logger.info("WebSocket 收到频道数据: %s", msg[:200])
+                return json.loads(msg)
+            elif opcode == websocket.ABNF.OPCODE_CLOSE:
+                break
+    except websocket.WebSocketConnectionClosedException:
+        logger.info("WebSocket 连接已关闭")
+    finally:
+        ws.close()
+
+    return {}
+
 
 def stream_audio_chunks(doc_id: str):
     """通过 WebSocket 连接下游服务，逐块 yield 音频数据"""
@@ -229,7 +270,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 session_id = request_body.get("sessionId", "")
                 query = request_body.get("query", "")
 
-                data = fetch_audio_data_from_downstream(session_id, query)
+                if CHANNEL_FETCH_MODE == "ws":
+                    data = fetch_audio_data_via_ws(session_id, query)
+                else:
+                    data = fetch_audio_data_from_downstream(session_id, query)
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -254,7 +298,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 if __name__ == '__main__':
-    port = 3000
+    port = 8080
     server_address = ('', port)
     httpd = HTTPServer(server_address, RequestHandler)
     print(f"云侧服务启动成功，监听端口 {port}")

@@ -17,8 +17,8 @@ import geohash_pure as gh
 from geohash_merge_pure import geohashes_to_polygons, to_geojson
 
 PRECISION = 6
-DATA_FILE = "D:/Projects/websocket_test/data.json"
-OUT_FILE  = "D:/Projects/websocket_test/route_polygon_pure.geojson"
+DATA_FILE = "D:/Projects/websocket_test/data3.json"
+OUT_FILE  = "D:/Projects/websocket_test/route_polygon3_pure.geojson"
 
 Coord = Tuple[float, float]
 
@@ -53,6 +53,26 @@ def coords_to_geohashes(coords: List[Coord], precision: int) -> List[str]:
     return result
 
 
+def expand_with_neighbors(geohashes: List[str], rings: int = 1) -> List[str]:
+    """每个格子向八个方向扩充 rings 圈，返回去重后的完整列表。"""
+    expanded: set[str] = set(geohashes)
+    for _ in range(rings):
+        frontier = list(expanded)
+        for code in frontier:
+            n = gh.get_adjacent(code, "top")
+            s = gh.get_adjacent(code, "bottom")
+            e = gh.get_adjacent(code, "right")
+            w = gh.get_adjacent(code, "left")
+            expanded.update([
+                n, s, e, w,
+                gh.get_adjacent(n, "right"),
+                gh.get_adjacent(n, "left"),
+                gh.get_adjacent(s, "right"),
+                gh.get_adjacent(s, "left"),
+            ])
+    return list(expanded)
+
+
 def main() -> None:
     data = load_json(DATA_FILE)
     paths = data["route"]["paths"]
@@ -62,7 +82,10 @@ def main() -> None:
     print(f"原始坐标点数: {len(coords)}")
 
     geohashes = coords_to_geohashes(coords, PRECISION)
-    print(f"唯一 geohash 数 (precision={PRECISION}): {len(geohashes)}")
+    print(f"路线 geohash 数 (precision={PRECISION}): {len(geohashes)}")
+
+    geohashes = expand_with_neighbors(geohashes, rings=2)
+    print(f"扩充八邻后 geohash 数: {len(geohashes)}")
 
     rings = geohashes_to_polygons(geohashes)
     print(f"合并后多边形数: {len(rings)}")
