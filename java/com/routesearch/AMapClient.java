@@ -3,38 +3,39 @@ package com.routesearch;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * Gaode (Amap) Web API wrapper — v5.
+ * HTTP: OkHttp3. JSON: fastjson2.
  * Thread-safe QPS rate limiting via synchronized block.
- * Requires: fastjson2, java.net.http (Java 11+).
  */
 public final class AMapClient {
 
     private static final String BASE = "https://restapi.amap.com/v5";
 
-    private final String     key;
-    private final long       minIntervalMs;
-    private       long       lastMs = 0;
-    private final Object     lock   = new Object();
-    private final HttpClient http;
+    private final String       key;
+    private final long         minIntervalMs;
+    private       long         lastMs = 0;
+    private final Object       lock   = new Object();
+    private final OkHttpClient http;
 
     public AMapClient(String apiKey, double qps) {
         this.key           = apiKey;
         this.minIntervalMs = (long)(1000.0 / qps);
-        this.http          = HttpClient.newBuilder()
-                                .connectTimeout(Duration.ofSeconds(10))
+        this.http          = new OkHttpClient.Builder()
+                                .connectTimeout(10, TimeUnit.SECONDS)
+                                .readTimeout(10,  TimeUnit.SECONDS)
                                 .build();
     }
 
@@ -56,22 +57,20 @@ public final class AMapClient {
             .collect(Collectors.joining("&"))
             + "&key=" + enc(key);
 
-        URI uri = URI.create(BASE + path + "?" + query);
-        HttpRequest req = HttpRequest.newBuilder()
-            .uri(uri)
-            .timeout(Duration.ofSeconds(10))
-            .GET()
+        Request request = new Request.Builder()
+            .url(BASE + path + "?" + query)
             .build();
 
-        try {
-            HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            JSONObject data = JSON.parseObject(resp.body());
+        try (Response response = http.newCall(request).execute()) {
+            ResponseBody body = response.body();
+            String bodyStr = body != null ? body.string() : "{}";
+            JSONObject data = JSON.parseObject(bodyStr);
             if (!"1".equals(data.getString("status"))) {
                 throw new AMapException(data.getString("info")
                     + " (infocode=" + data.getString("infocode") + ")");
             }
             return data;
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new AMapException("HTTP error: " + e.getMessage(), e);
         }
     }
